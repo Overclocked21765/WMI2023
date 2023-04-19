@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.mechanisms.beta.Actuator;
 
 @Config
-@TeleOp
+@TeleOp(group = "Hardware tests")
 public class PIDTest extends OpMode{
     public static double target = 0;
     Actuator actuator = new Actuator();

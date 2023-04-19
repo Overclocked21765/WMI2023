@@ -31,7 +31,11 @@ public class Slide {
         hasBeenToldToRotate = true;
         //TEMP 2/1
         //This will set the slide servo to sit at the back of the robot (where we put the claw when picking up from ground)
-        slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
+        if (Math.abs(slideServo.getPosition() - Constants.SLIDE_SERVO_ZERO_POSITION) < Math.abs(slideServo.getPosition() - Constants.SLIDE_SERVO_ROTATED_POSITION)){
+            slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
+        } else {
+            slideServo.setPosition(Constants.SLIDE_SERVO_ROTATED_POSITION);
+        }
     }
 
     public void setSlidePosition(int encoderPosition){
@@ -61,12 +65,10 @@ public class Slide {
     }
 
     public void rotateServo(){
-        if (hasBeenToldToRotate){
+        if (Math.abs(slideServo.getPosition() - Constants.SLIDE_SERVO_ZERO_POSITION) < 0.02){
             slideServo.setPosition(Constants.SLIDE_SERVO_ROTATED_POSITION);
-            hasBeenToldToRotate = false;
         } else {
             slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
-            hasBeenToldToRotate = true;
         }
     }
 
