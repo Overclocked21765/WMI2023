@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.util.Constants.ROTATION_CONSTANT;
 
 public class Algorithms {
     //remaps joystick from grid to circle
-    static double[] mapJoystick(double x, double y){
+    public static double[] mapJoystick(double x, double y){
         double m_x = x * Math.sqrt(1 - y * y / 2);
         double m_y = y * Math.sqrt(1 - x * x / 2);
         double[] converted = {m_x, m_y};
@@ -95,5 +95,28 @@ public class Algorithms {
         backRight *= scalePower;
         double[] values = {frontLeft, frontRight, backLeft, backRight};
         return values;
+    }
+
+    public static Vector[] returnSwerve(Vector drive, double rotation, double heading){
+        double offsetTheta = 45;
+        double rotPower = 0.8;
+
+        Vector correctedDrive = drive.rotate(heading);
+        Vector FL = correctedDrive.add(new Vector(new Vector.VectorPolar(rotation * rotPower, offsetTheta)));
+        Vector FR = correctedDrive.add(new Vector(new Vector.VectorPolar(rotation * rotPower, -offsetTheta)));
+        Vector BL = correctedDrive.add(new Vector(new Vector.VectorPolar(rotation * rotPower, 180 - offsetTheta)));
+        Vector BR = correctedDrive.add(new Vector(new Vector.VectorPolar(rotation * rotPower, 180 + offsetTheta)));
+
+        return neutralize(FL, FR, BL, BR);
+
+    }
+
+    public static Vector[] neutralize(Vector one, Vector two, Vector three, Vector four){
+        double max = Math.max(Math.max(one.r, two.r),
+                Math.max(three.r, four.r));
+        return new Vector[] {new Vector(new Vector.VectorPolar(one.r / max, one.theta)),
+                            new Vector(new Vector.VectorPolar(two.r / max, two.theta)),
+                            new Vector(new Vector.VectorPolar(three.r / max, three.theta)),
+                            new Vector(new Vector.VectorPolar(four.r / max, four.theta))};
     }
 }
