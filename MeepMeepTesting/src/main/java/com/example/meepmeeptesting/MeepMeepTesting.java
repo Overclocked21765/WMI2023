@@ -83,7 +83,7 @@ public class MeepMeepTesting {
                         );
 
         RoadRunnerBotEntity start = new DefaultBotBuilder(meepMeep)
-                .setConstraints(30, 15, Math.toRadians(213), Math.toRadians(60), 13.75)
+                .setConstraints(60, 60, Math.toRadians(360), Math.toRadians(360), 13.75)
                         .followTrajectorySequence(drive  ->
                                 drive.trajectorySequenceBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
                                                 .lineToLinearHeading(new Pose2d(-36, -15, Math.toRadians(-42)))
@@ -123,14 +123,23 @@ public class MeepMeepTesting {
                                         .build()
                         );
 
-
+        RoadRunnerBotEntity pathTest = new DefaultBotBuilder(meepMeep)
+                .setColorScheme(new ColorSchemeRedLight())
+                .setConstraints(60, 60, Math.toRadians(420), Math.toRadians(360), 13.75)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
+                                .lineTo(new Vector2d(-36, -15))
+                                .turn(Math.toRadians(-132))
+                                .lineTo(new Vector2d(-28, -18))
+                                .build()
+                );
 
 
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(stackToJunction)
+                .addEntity(pathTest)
                 .start();
     }
 }

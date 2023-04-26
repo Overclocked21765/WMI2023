@@ -6,6 +6,8 @@ public class PIDController {
     private double kP;
     private double kI;
     private double kD;
+    private double a;
+    private double integralSumLimit;
 
     private ElapsedTime timer;
 
@@ -17,48 +19,55 @@ public class PIDController {
     private double lastTarget;
     private double lastEstimate;
 
+
+
+
+
     public PIDController(double kP, double kI, double kD){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
         totalError = 0;
         dt = 0;
+        a = 0.25;
+        integralSumLimit = 0.8;
         timer = new ElapsedTime();
+        lastEstimate = 0;
     }
 
     public void setPID(double kP, double kI, double kD){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
-        timer.reset();
-        lastTime = 0;
     }
 
-    public double calculate(double estimate, double reference){
-        this.reference = reference;
-
-
-        double value = kP * pController(estimate, this.reference) + kI * iController(estimate, this.reference) - kD * dController(estimate, this.reference);
-        lastTarget = this.reference;
-        lastError = reference - estimate;
-        lastEstimate = estimate;
-
-        return value;
-
-    }
-
-    public double pController(double estimate, double target){
-        return (target - estimate);
-    }
-
-    public double iController(double estimate, double target){
-        return totalError += ((target - estimate) * timer.time());
-    }
-
-    public double dController(double estimate, double target){
-        if (lastTarget != target){
-            return (((target - estimate) - (target - lastEstimate)) / timer.time());
+    public double calculate(double newMeasurement, double target){
+        double currentEstimate = a * lastEstimate + (1 - a) * newMeasurement;
+        lastEstimate = currentEstimate;
+        if (target != lastTarget){
+            timer.reset();
+            reference = target;
+            lastError = reference - currentEstimate;
+            totalError = 0;
         }
-        return (((target - estimate) - lastError) / timer.time());
+
+        double pTerm = reference - currentEstimate;
+        dt = timer.time();
+        timer.reset();
+
+        totalError += dt * currentEstimate;
+
+        if (totalError > integralSumLimit){
+            totalError = integralSumLimit;
+        } else if (totalError < -integralSumLimit){
+            totalError = -integralSumLimit;
+        }
+
+        double dTerm = (currentEstimate - lastEstimate) / dt;
+
+        timer.reset();
+        lastTarget = reference;
+
+        return kP * pTerm + kI * totalError - kD * dTerm;
     }
 }
