@@ -97,6 +97,7 @@ public class Algorithms {
         return values;
     }
 
+    //vector calculations for coaxial swerve (r = direction, theta = power)
     public static Vector[] returnSwerve(Vector drive, double rotation, double heading){
         double offsetTheta = 45;
         double rotPower = 0.8;
@@ -111,6 +112,9 @@ public class Algorithms {
 
     }
 
+    //coaxial swerve
+    //rescales four vectors such that max r = 1
+    //ensures motor never tries to set more power than possible
     public static Vector[] neutralize(Vector one, Vector two, Vector three, Vector four){
         double max = Math.max(Math.max(one.r, two.r),
                 Math.max(three.r, four.r));

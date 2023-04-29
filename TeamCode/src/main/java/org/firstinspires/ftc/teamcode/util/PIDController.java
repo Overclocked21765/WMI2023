@@ -64,8 +64,6 @@ public class PIDController {
         }
 
         double dTerm = (currentEstimate - lastEstimate) / dt;
-
-        timer.reset();
         lastTarget = reference;
 
         return kP * pTerm + kI * totalError - kD * dTerm;

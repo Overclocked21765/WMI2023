@@ -83,14 +83,15 @@ public class MeepMeepTesting {
                         );
 
         RoadRunnerBotEntity start = new DefaultBotBuilder(meepMeep)
-                .setConstraints(60, 60, Math.toRadians(360), Math.toRadians(360), 13.75)
+                .setConstraints(40, 15, Math.toRadians(215), Math.toRadians(60), 13.75)
                         .followTrajectorySequence(drive  ->
                                 drive.trajectorySequenceBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
-                                                .lineToLinearHeading(new Pose2d(-36, -15, Math.toRadians(-42)))
+                                                .lineTo(new Vector2d(-36, -15))
+                                        .turn(Math.toRadians(-132))
                                 .lineToConstantHeading(new Vector2d(-28, -18))
                                         .setReversed(true)
                                 .splineTo(new Vector2d(-44, -12), Math.toRadians(180))
-                                .splineTo(new Vector2d(-60, -12), Math.toRadians(180))
+                                .splineTo(new Vector2d(-62, -12), Math.toRadians(180))
                                         .waitSeconds(1)
                                         .setReversed(false)
                                         .splineTo(new Vector2d(-44, -12), Math.toRadians(0))
@@ -124,13 +125,19 @@ public class MeepMeepTesting {
                         );
 
         RoadRunnerBotEntity pathTest = new DefaultBotBuilder(meepMeep)
-                .setColorScheme(new ColorSchemeRedLight())
-                .setConstraints(60, 60, Math.toRadians(420), Math.toRadians(360), 13.75)
+                .setColorScheme(new ColorSchemeBlueDark())
+                .setConstraints(50, 30, Math.toRadians(215), Math.toRadians(180), 13.75)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
-                                .lineTo(new Vector2d(-36, -15))
-                                .turn(Math.toRadians(-132))
-                                .lineTo(new Vector2d(-28, -18))
+                                .lineTo(new Vector2d(-36, -5))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(-28, -18), Math.toRadians(-42))
+                                .setReversed(false)
+                                .splineTo(new Vector2d(-44, -12), Math.toRadians(180))
+                                .splineTo(new Vector2d(-62, -12), Math.toRadians(180))
+                                .setReversed(true)
+                                .splineTo(new Vector2d(-44, -12), Math.toRadians(0))
+                                .splineTo(new Vector2d(-28, -18), Math.toRadians(-42))
                                 .build()
                 );
 
@@ -140,6 +147,7 @@ public class MeepMeepTesting {
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(pathTest)
+                .addEntity(start)
                 .start();
     }
 }
