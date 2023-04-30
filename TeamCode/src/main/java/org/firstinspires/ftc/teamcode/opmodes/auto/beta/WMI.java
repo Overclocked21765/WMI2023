@@ -1,34 +1,182 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto.beta;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.mechanisms.Camera;
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.mechanisms.Slide;
+import org.firstinspires.ftc.teamcode.opmodes.auto.AutoCycleNewPathsRight;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
 
+@Config
 @Autonomous(name = "WMI")
 public class WMI extends OpMode {
+
+    AutoCycleNewPathsRight.States state;
+
     SampleMecanumDrive drive;
     Claw claw = new Claw();
     Slide slide = new Slide();
     Camera camera = new Camera();
 
-    
+    ElapsedTime clawTimer = new ElapsedTime();
+    ElapsedTime slideTImer = new ElapsedTime();
+    ElapsedTime runtime = new ElapsedTime();
+
+    SleeveDetection.ParkingPosition parkingPosition;
+
+    TrajectorySequence startTrajectory;
+    TrajectorySequence junctionToStack;
+    TrajectorySequence stackToJunction;
+    TrajectorySequence zoneTwo;
+    TrajectorySequence zoneThree;
+
+
+    boolean wantToPark;
+
+    public static double timeToPark = 24;
+    public static int coneIndex;
 
     @Override
     public void init(){
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        coneIndex = 0;
+        wantToPark = false;
+        state = AutoCycleNewPathsRight.States.HEADING_TO_JUNCTION;
+
         drive = new SampleMecanumDrive(hardwareMap);
         claw.init(hardwareMap);
-        slide.init(hardwareMap);
+        slide.init(hardwareMap, telemetry);
         camera.init(hardwareMap);
+
+        drive.setPoseEstimate(new Pose2d(-36, -60, Math.toRadians(90)));
+
+        startTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+                .lineTo(new Vector2d(-36, -5))
+                .setReversed(true)
+                .splineTo(new Vector2d(-28, -18), Math.toRadians(-42))
+                .build();
+
+        junctionToStack = drive.trajectorySequenceBuilder(startTrajectory.end())
+                .splineTo(new Vector2d(-44, -12), Math.toRadians(180))
+                .splineTo(new Vector2d(-62, -12), Math.toRadians(180))
+                .build();
+
+        stackToJunction = drive.trajectorySequenceBuilder(junctionToStack.end())
+                .setReversed(true)
+                .splineTo(new Vector2d(-44, -12), Math.toRadians(0))
+                .splineTo(new Vector2d(-28, -18), Math.toRadians(-42))
+                .build();
+
+        zoneTwo = drive.trajectorySequenceBuilder(stackToJunction.end())
+                .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(90)))
+                .build();
+
+        zoneThree = drive.trajectorySequenceBuilder(stackToJunction.end())
+                .lineToLinearHeading(new Pose2d(-36, -12, Math.toRadians(90)))
+                .lineTo(new Vector2d(-12, -12))
+                .build();
 
 
     }
 
     @Override
-    public void loop(){
+    public void init_loop(){
+        parkingPosition = camera.returnZoneEnumerated();
+        telemetry.addData("Zone", parkingPosition);
+    }
 
+    @Override
+    public void start(){
+        drive.followTrajectorySequenceAsync(startTrajectory);
+        slide.setSlidePosition(Constants.MEDIUM_POSITION);
+        slide.update();
+        runtime.reset();
+    }
+
+    @Override
+    public void loop(){
+        double[] coneStackValues = {Constants.CONE_FOUR, Constants.CONE_THREE, Constants.CONE_TWO, Constants.CONE_ONE, Constants.GROUND_POSITION};
+        switch (state){
+            case HEADING_TO_JUNCTION:
+                claw.grab();
+                if (!drive.isBusy()){
+                    claw.release();
+                    clawTimer.reset();
+                    if (runtime.time() >= timeToPark){
+                        wantToPark = true;
+                        if (parkingPosition == SleeveDetection.ParkingPosition.LEFT){
+                            drive.followTrajectorySequenceAsync(junctionToStack);
+                        } else if (parkingPosition == SleeveDetection.ParkingPosition.CENTER){
+                            drive.followTrajectorySequenceAsync(zoneThree);
+                        } else {
+                            drive.followTrajectorySequenceAsync(zoneTwo);
+                        }
+                        state = AutoCycleNewPathsRight.States.PARKING;
+                        slide.setSlidePosition(Constants.GROUND_POSITION);
+
+                    }
+                    if (!wantToPark){
+                        drive.followTrajectorySequenceAsync(junctionToStack);
+                        state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_1;
+                    }
+
+                }
+                break;
+            case HEADING_TO_CONES_1:
+                if (clawTimer.time() > Constants.TIME_FOR_RELEASE_CLAW){
+                    slide.rotateServo();
+                    slideTImer.reset();
+                    state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_2;
+                }
+                break;
+            case HEADING_TO_CONES_2:
+                if (slideTImer.time() > Constants.SERVO_ROTATE_TIME){
+                    slide.setSlidePosition(coneStackValues[coneIndex]);
+                    coneIndex++;
+                    state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_3;
+                }
+                break;
+            case HEADING_TO_CONES_3:
+                if (!drive.isBusy()){
+                    claw.grab();
+                    clawTimer.reset();
+                    state = AutoCycleNewPathsRight.States.GRABBING_1;
+                }
+                break;
+            case GRABBING_1:
+                if (clawTimer.time() > Constants.TIME_FOR_RELEASE_CLAW){
+                    slide.setSlidePosition(Constants.RED_ZONE);
+                    state = AutoCycleNewPathsRight.States.GRABBING_2;
+                }
+                break;
+            case GRABBING_2:
+                if (slide.atTarget()){
+                    slide.setSlidePosition(Constants.HIGH_POSITION);
+                    slide.rotateServo();
+                    state = AutoCycleNewPathsRight.States.HEADING_TO_JUNCTION;
+                    drive.followTrajectorySequenceAsync(stackToJunction);
+                }
+                break;
+            case PARKING:
+                if (!drive.isBusy()){
+                    state = AutoCycleNewPathsRight.States.STILL_1;
+                }
+        }
+        drive.update();
+        slide.update();
+        telemetry.addData("State: ", state);
+        telemetry.addData("Cone index: ", coneIndex);
     }
 }

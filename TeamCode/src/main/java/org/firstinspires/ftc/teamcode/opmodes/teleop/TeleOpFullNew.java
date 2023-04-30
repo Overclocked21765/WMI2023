@@ -26,6 +26,8 @@
 // oppisiite side is 0.04 for dropping cones
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -95,9 +97,11 @@ public class TeleOpFullNew extends OpMode {
 
     @Override
     public void init(){
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
         driveTrain.init(hardwareMap);
         //When the slide initializes the claw will go to the slide servo position 0.71
-        slide.init(hardwareMap);
+        slide.init(hardwareMap, telemetry);
         claw.init(hardwareMap);
 
         //initializing variables
@@ -448,6 +452,8 @@ public class TeleOpFullNew extends OpMode {
             startLetGoFirstTime = false;
             resetSlideFirstTime = true;
         }
+
+        slide.update();
 
         aAlreadyPressed = gamepad1.a;
         bAlreadyPressed = gamepad1.b;

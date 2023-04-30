@@ -1,48 +1,86 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.PIDController;
 
 //if motor direction is FORWARD:
 //negative power is extend, positive is retract
 
-
+@Config
 public class Slide {
     private DcMotorEx linearSlideMotor;
     private Servo slideServo;
     private double ticksPerRevolution;
     private boolean hasBeenToldToRotate;
-    public void init(HardwareMap hwMap){
+    private double target;
+
+    public static double kF = 0.245;
+    public static double kP = 0.01;
+    public static double kI = 0;
+    public static double kD = 0.8;
+
+    private PIDController controller;
+
+    Telemetry telemetry;
+
+    public void init(HardwareMap hwMap, Telemetry telemetry){
         linearSlideMotor = hwMap.get(DcMotorEx.class, "Slide_Motor");
         linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         linearSlideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         slideServo = hwMap.get(Servo.class, "Slide_Servo");
         slideServo.setDirection(Servo.Direction.FORWARD);
 
+        controller = new PIDController(kP, kI, kD);
+
+        this.telemetry = telemetry;
+
         ticksPerRevolution = linearSlideMotor.getMotorType().getTicksPerRev();
         hasBeenToldToRotate = true;
         //TEMP 2/1
         //This will set the slide servo to sit at the back of the robot (where we put the claw when picking up from ground)
-        if (Math.abs(slideServo.getPosition() - Constants.SLIDE_SERVO_ZERO_POSITION) < Math.abs(slideServo.getPosition() - Constants.SLIDE_SERVO_ROTATED_POSITION)){
-            slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
-        } else {
-            slideServo.setPosition(Constants.SLIDE_SERVO_ROTATED_POSITION);
-        }
+        slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
     }
 
+    public void init(HardwareMap hwMap){
+        linearSlideMotor = hwMap.get(DcMotorEx.class, "Slide_Motor");
+        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        linearSlideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        slideServo = hwMap.get(Servo.class, "Slide_Servo");
+        slideServo.setDirection(Servo.Direction.FORWARD);
+
+        controller = new PIDController(kP, kI, kD);
+
+        ticksPerRevolution = linearSlideMotor.getMotorType().getTicksPerRev();
+        hasBeenToldToRotate = true;
+        //TEMP 2/1
+        //This will set the slide servo to sit at the back of the robot (where we put the claw when picking up from ground)
+        slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
+    }
+
+    /*
     public void setSlidePosition(int encoderPosition){
         linearSlideMotor.setTargetPosition(encoderPosition);
         linearSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         linearSlideMotor.setPower(Constants.MOTOR_SLIDE_POWER);
     }
+
+     */
 
     public void moveSlide(double speed){
         if (linearSlideMotor.getCurrentPosition() >= (Constants.LINEAR_SLIDE_MINIMUM - Constants.LINEAR_SLIDE_MARGIN_ERROR) && linearSlideMotor.getCurrentPosition() <= (Constants.LINEAR_SLIDE_MAXIMUM - Constants.LINEAR_SLIDE_MARGIN_ERROR)){
@@ -74,6 +112,25 @@ public class Slide {
 
     public void moveSlideNoLimitations(double power){
         linearSlideMotor.setPower(power * Constants.MOTOR_SLIDE_POWER);
+    }
+
+    public void setSlidePosition(double target){
+        this.target = target;
+    }
+
+    public void update(){
+        controller.setPID(kP, kI, kD);
+        double power = controller.calculate(getSlidePos(), target);
+        linearSlideMotor.setPower(kF + power);
+        telemetry.addData("Target: ", target);
+        telemetry.addData("Current position: ", linearSlideMotor.getCurrentPosition());
+    }
+
+    public boolean atTarget(){
+        if (Math.abs(linearSlideMotor.getCurrentPosition() - target) < 10){
+            return true;
+        }
+        return false;
     }
 
     public int getTargetPos(){

@@ -21,10 +21,11 @@ import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
 @Autonomous(name = "Right 1 + 1")
 public class AutoCycleNewPathsRight extends OpMode {
 
-    enum States{
+    public enum States{
         START,
         HEADING_TO_CONES_1,
         HEADING_TO_CONES_2,
+        HEADING_TO_CONES_3,
         GRABBING_1,
         GRABBING_2,
         HEADING_TO_JUNCTION,
