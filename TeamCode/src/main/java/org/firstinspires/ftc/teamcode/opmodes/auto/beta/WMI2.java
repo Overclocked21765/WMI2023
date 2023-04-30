@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
 
 @Config
-@Autonomous(name = "WMI Left")
-public class WMI extends OpMode {
+@Autonomous(name = "WMI Right")
+public class WMI2 extends OpMode {
 
     AutoCycleNewPathsRight.States state;
 
@@ -39,12 +39,7 @@ public class WMI extends OpMode {
     TrajectorySequence junctionToStack;
     TrajectorySequence stackToJunction;
     TrajectorySequence zoneTwo;
-    TrajectorySequence zoneThree;
-    TrajectorySequence stackToJunction1;
-    TrajectorySequence junctionToStack1;
-    TrajectorySequence stackToJunction2;
-    TrajectorySequence junctionToStack2;
-
+    TrajectorySequence zoneOne;
 
 
     boolean wantToPark;
@@ -52,18 +47,18 @@ public class WMI extends OpMode {
     public static double timeToPark = 24;
     public static int coneIndex;
 
-    public static double startX = -35;
-    public static double startY = -63;
-    public static double signalY = -5;
-    public static double scoreX = -28;
-    public static double scoreY = -19;
-    public static double tangentX = -44;
+    public static double startX = 36;
+    public static double startY = -60;
+    public static double signalX = -5;
+    public static double scoreX = 28;
+    public static double scoreY = -18;
+    public static double tangentX = 44;
     public static double coneX = -60;
-    public static double coneY = -11;
+    public static double coneY = -12;
 
     public static double parkX = -12;
-    public static double zone2X = -36;
-    public static double zoneThreeX = -12;
+    public static double zone2X = 36;
+    public static double zoneOneX = 12;
 
     @Override
     public void init(){
@@ -81,9 +76,9 @@ public class WMI extends OpMode {
         drive.setPoseEstimate(new Pose2d(startX, startY, Math.toRadians(90)));
 
         startTrajectory = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineTo(new Vector2d(startX, signalY))
+                .lineTo(new Vector2d(startX, signalX))
                 .setReversed(true)
-                .splineTo(new Vector2d(scoreX, scoreY), Math.toRadians(-42))
+                .splineTo(new Vector2d(scoreX, scoreY), Math.toRadians(222))
                 .build();
 
         junctionToStack = drive.trajectorySequenceBuilder(startTrajectory.end())
@@ -94,40 +89,16 @@ public class WMI extends OpMode {
         stackToJunction = drive.trajectorySequenceBuilder(junctionToStack.end())
                 .setReversed(true)
                 .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(0))
-                .splineTo(new Vector2d(scoreX, scoreY), Math.toRadians(-42))
+                .splineTo(new Vector2d(scoreX, scoreY), Math.toRadians(222))
                 .build();
 
-        junctionToStack1 = drive.trajectorySequenceBuilder(stackToJunction.end())
-                .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(180))
-                .splineTo(new Vector2d(coneX - 1, coneY), Math.toRadians(180))
-                .build();
-
-        stackToJunction1 = drive.trajectorySequenceBuilder(junctionToStack.end())
-                .setReversed(true)
-                .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(0))
-                .splineTo(new Vector2d(scoreX - 1, scoreY), Math.toRadians(-42))
-                .build();
-
-        junctionToStack2 =  drive.trajectorySequenceBuilder(stackToJunction1.end())
-                .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(180))
-                .splineTo(new Vector2d(coneX - 2, coneY), Math.toRadians(180))
-                .build();
-
-        stackToJunction2 = drive.trajectorySequenceBuilder(junctionToStack2.end())
-                .setReversed(true)
-                .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(0))
-                .splineTo(new Vector2d(scoreX - 2.5, scoreY), Math.toRadians(-42))
-                .build();
-
-
-
-        zoneTwo = drive.trajectorySequenceBuilder(stackToJunction2.end())
+        zoneTwo = drive.trajectorySequenceBuilder(stackToJunction.end())
                 .lineToLinearHeading(new Pose2d(zone2X, parkX, Math.toRadians(90)))
                 .build();
 
-        zoneThree = drive.trajectorySequenceBuilder(stackToJunction2.end())
+        zoneOne = drive.trajectorySequenceBuilder(stackToJunction.end())
                 .lineToLinearHeading(new Pose2d(zone2X, parkX, Math.toRadians(90)))
-                .lineTo(new Vector2d(zoneThreeX, parkX))
+                .lineTo(new Vector2d(zoneOneX, parkX))
                 .build();
 
 
@@ -151,8 +122,6 @@ public class WMI extends OpMode {
     @Override
     public void loop(){
         double[] coneStackValues = {Constants.CONE_FOUR, Constants.CONE_THREE, Constants.CONE_TWO, Constants.CONE_ONE, Constants.GROUND_POSITION};
-        TrajectorySequence[] junctionsToStack = {junctionToStack, junctionToStack1, junctionToStack2};
-        TrajectorySequence[] stacsksToJunction = {stackToJunction, stackToJunction1, stackToJunction2};
         switch (state){
             case HEADING_TO_JUNCTION:
                 claw.grab();
@@ -161,19 +130,19 @@ public class WMI extends OpMode {
                     clawTimer.reset();
                     if (runtime.time() >= timeToPark){
                         wantToPark = true;
-                        if (parkingPosition == SleeveDetection.ParkingPosition.LEFT){
-                            drive.followTrajectorySequenceAsync(junctionToStack2);
-                        } else if (parkingPosition == SleeveDetection.ParkingPosition.RIGHT){
-                            drive.followTrajectorySequenceAsync(zoneThree);
+                        if (parkingPosition == SleeveDetection.ParkingPosition.RIGHT){
+                            drive.followTrajectorySequenceAsync(junctionToStack);
+                        } else if (parkingPosition == SleeveDetection.ParkingPosition.LEFT){
+                            drive.followTrajectorySequenceAsync(zoneOne);
                         } else {
                             drive.followTrajectorySequenceAsync(zoneTwo);
                         }
                         state = AutoCycleNewPathsRight.States.PARKING;
-
+                        slide.setSlidePosition(Constants.GROUND_POSITION);
 
                     }
                     if (!wantToPark){
-                        drive.followTrajectorySequenceAsync(junctionsToStack[coneIndex]);
+                        drive.followTrajectorySequenceAsync(junctionToStack);
                         state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_1;
                     }
 
@@ -207,19 +176,14 @@ public class WMI extends OpMode {
                 }
                 break;
             case GRABBING_2:
-                if (slide.getSlidePos() > Constants.RED_ZONE){
+                if (slide.atTarget()){
                     slide.setSlidePosition(Constants.MEDIUM_POSITION);
                     slide.rotateServo();
                     state = AutoCycleNewPathsRight.States.HEADING_TO_JUNCTION;
-                    drive.followTrajectorySequenceAsync(stacsksToJunction[coneIndex - 1]);
+                    drive.followTrajectorySequenceAsync(stackToJunction);
                 }
                 break;
             case PARKING:
-                if (clawTimer.time() >  Constants.TIME_FOR_RELEASE_CLAW){
-                    slide.setSlidePosition(Constants.GROUND_POSITION);
-                    state = AutoCycleNewPathsRight.States.PARKING_2;
-                }
-            case PARKING_2:
                 if (!drive.isBusy()){
                     state = AutoCycleNewPathsRight.States.STILL_1;
                 }

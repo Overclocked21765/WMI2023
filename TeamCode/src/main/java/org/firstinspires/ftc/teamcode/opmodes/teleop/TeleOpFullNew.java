@@ -334,7 +334,6 @@ public class TeleOpFullNew extends OpMode {
 
         telemetry.addData("Level: ", level);
         telemetry.addData("Slide encoder ticks: ", slide.getSlidePosition());
-        telemetry.addData("Target position: ", slide.getTargetPos());
 
         if (slide.getSlidePosition() > (Constants.LINEAR_SLIDE_MAXIMUM + 3)){
             slide.setSlidePosition(Constants.LINEAR_SLIDE_MAXIMUM);
@@ -451,9 +450,11 @@ public class TeleOpFullNew extends OpMode {
             slide.stopAndReset();
             startLetGoFirstTime = false;
             resetSlideFirstTime = true;
+        } else if (gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0){
+            slide.update();
         }
 
-        slide.update();
+
 
         aAlreadyPressed = gamepad1.a;
         bAlreadyPressed = gamepad1.b;
