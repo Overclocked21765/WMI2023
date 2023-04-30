@@ -55,11 +55,11 @@ public class WMI extends OpMode {
     public static double startX = -35;
     public static double startY = -63;
     public static double signalY = -5;
-    public static double scoreX = -28;
-    public static double scoreY = -19;
+    public static double scoreX = -27.5;
+    public static double scoreY = -19.5;
     public static double tangentX = -44;
     public static double coneX = -60;
-    public static double coneY = -11;
+    public static double coneY = -12;
 
     public static double parkX = -12;
     public static double zone2X = -36;
@@ -116,7 +116,7 @@ public class WMI extends OpMode {
         stackToJunction2 = drive.trajectorySequenceBuilder(junctionToStack2.end())
                 .setReversed(true)
                 .splineTo(new Vector2d(tangentX, coneY), Math.toRadians(0))
-                .splineTo(new Vector2d(scoreX - 2.5, scoreY), Math.toRadians(-42))
+                .splineTo(new Vector2d(scoreX - 2.5, scoreY - 0.5), Math.toRadians(-42))
                 .build();
 
 
