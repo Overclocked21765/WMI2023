@@ -40,6 +40,10 @@ public class VuforiaCamera{
         }
     }
 
+    public void returnZone(){
+
+    }
+
     private void initVuforia(HardwareMap hardwareMap) {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.

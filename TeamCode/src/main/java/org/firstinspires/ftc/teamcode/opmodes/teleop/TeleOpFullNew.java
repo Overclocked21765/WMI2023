@@ -199,6 +199,7 @@ public class TeleOpFullNew extends OpMode {
         //slide
 
         if (gamepad1.dpad_down && !downAlreadyPressed){
+            claw.grab();
             slide.setSlidePosition(Constants.GROUND_POSITION);
         }
 
