@@ -22,7 +22,7 @@ public class VuforiaCamera{
             "RIGHT"
     };
 
-    private static final String VUFORIA_KEY = "temp";
+    private static final String VUFORIA_KEY = "ARRtijT/////AAABmaas7HmGUkpGnc/la0f1qkYGyhwQh7Gx6LH9CrSjDFApISx5ok/AxHO8wJdCwLQVaQWiILztuRVcx3STXoKyKk5jClN1mGdqDf5U04y0Vjt/lgx/zgAoti8p8WjVtz8DwTKIEZgyz+C1Jaw1IMiFmYssl4kotmqJL094RKtboIgtqgHcXMaWwqKE45qjDomacBCoOC04uQ8I61931glD9vgJR66Rk3hPNAt/DRr79AxdGLht/Fws74jY0eI7ZNn2WWuol0zBhIGuCpgO0PyabDfwYaAqRiqp0RcHf0dk1Hgp58VsRKSpeCqsR45IPrfeDJkGTtxGzUVENeKoFSCpLK7cIIhTY6BYG/PdyVxUjpQs";
 
     private VuforiaLocalizer vuforia;
 
