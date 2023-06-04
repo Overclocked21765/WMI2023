@@ -3,18 +3,23 @@ package org.firstinspires.ftc.teamcode.mechanisms.beta;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
+
+import java.util.List;
 
 public class VuforiaCamera{
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_ASSET = "wmi.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
     private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+            "LEFT",
+            "CENTER",
+            "RIGHT"
     };
 
     private static final String VUFORIA_KEY = "temp";
@@ -23,7 +28,14 @@ public class VuforiaCamera{
 
     private TFObjectDetector tfod;
 
-    public void init(HardwareMap hardwareMap){
+    Telemetry telemetry;
+
+    String lastPosition;
+    SleeveDetection.ParkingPosition trueLastPosition;
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry){
+        this.telemetry = telemetry;
+
         initVuforia(hardwareMap);
         initTfod(hardwareMap);
 
@@ -38,9 +50,63 @@ public class VuforiaCamera{
             // (typically 16/9).
             tfod.setZoom(1.0, 16.0/9.0);
         }
+
+        lastPosition = "CENTER";
+        trueLastPosition = SleeveDetection.ParkingPosition.CENTER;
     }
 
-    public void returnZone(){
+    public SleeveDetection.ParkingPosition returnZoneEnumerated(){
+        String name = lastPosition;
+        double max = 0;
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Objects Detected", updatedRecognitions.size());
+
+                // step through the list of recognitions and display image position/size information for each one
+                // Note: "Image number" refers to the randomized image orientation/number
+
+                for (Recognition recognition : updatedRecognitions) {
+                    double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
+                    double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
+                    double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
+                    double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
+
+
+
+                    telemetry.addData(""," ");
+                    double confidence = recognition.getConfidence();
+                    String label = recognition.getLabel();
+                    telemetry.addData("Image", "%s (%.0f %% Conf.)", label, confidence * 100 );
+                    telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
+                    telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+
+                    if (confidence > max){
+                        max = confidence;
+                        name = label;
+                    }
+
+
+
+                }
+                if (name.equals(LABELS[0])){
+                    lastPosition = LABELS[0];
+                    trueLastPosition = SleeveDetection.ParkingPosition.LEFT;
+                    return trueLastPosition;
+                } else if (name.equals(LABELS[1])){
+                    lastPosition = LABELS[1];
+                    trueLastPosition = SleeveDetection.ParkingPosition.CENTER;
+                    return trueLastPosition;
+                } else if (name.equals(LABELS[2])){
+                    lastPosition = LABELS[2];
+                    trueLastPosition = SleeveDetection.ParkingPosition.RIGHT;
+                    return trueLastPosition;
+                }
+            }
+        }
+        return trueLastPosition;
 
     }
 
