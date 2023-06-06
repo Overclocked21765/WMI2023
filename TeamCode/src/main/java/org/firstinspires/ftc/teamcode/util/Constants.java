@@ -25,7 +25,7 @@ public class Constants {
     public static int CONE_THREE = 260; //conestack 3 492
     public static int CONE_FOUR = 310; //conestack 4 653
     public static int RED_ZONE = 525; //the height at which it is safe to rotate the claw, this was initially 10
-    public static int LINEAR_SLIDE_MINIMUM = 60; //lowest point for linear slide
+    public static int LINEAR_SLIDE_MINIMUM = 60; //lowest point   for linear slide
     public static int LINEAR_SLIDE_MAXIMUM = 1280; //highest point for linear slide
     public static final int LINEAR_SLIDE_MARGIN_ERROR = 10; //a margin of error to account for PID
     public static int test_target = 0;
@@ -34,8 +34,8 @@ public class Constants {
     public static final double SLIDE_SERVO_ROTATED_POSITION = 0.04; //should be 0.04 for testing its been changed
     public static final double SERVO_ROTATE_TIME = 1;
     //Claw constants
-    public static final double CLAW_MIN = 0.31; //grab
-    public static final double CLAW_MAX = 0.23; //release
+    public static final double CLAW_MIN = 0.69; //grab
+    public static final double CLAW_MAX = 0.54; //release
     public static double TIME_FOR_RELEASE_CLAW = 0.3;
     //Auto Constants
     public static class Auto{

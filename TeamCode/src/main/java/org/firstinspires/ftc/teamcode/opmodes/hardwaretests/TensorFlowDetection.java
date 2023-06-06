@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.vision.SleeveDetection;
 
 @TeleOp(group = "Hardware tests")
 public class TensorFlowDetection extends OpMode {
-    VuforiaCamera vuforiaCamera;
+    VuforiaCamera vuforiaCamera = new VuforiaCamera();
     SleeveDetection.ParkingPosition parkingPosition;
     @Override
     public void init(){
