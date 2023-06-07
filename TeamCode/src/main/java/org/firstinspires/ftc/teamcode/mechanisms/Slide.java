@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,10 +22,10 @@ public class Slide {
     private boolean hasBeenToldToRotate;
     private double target;
 
-    public static double kF = 0.245;
-    public static double kP = 0.01;
+    public static double kF = 0;
+    public static double kP = 0;
     public static double kI = 0;
-    public static double kD = 0.8;
+    public static double kD = 0;
 
     public static int test_target = 0;
 
@@ -45,7 +43,7 @@ public class Slide {
         slideServo = hwMap.get(Servo.class, "Slide_Servo");
         slideServo.setDirection(Servo.Direction.FORWARD);
 
-        controller = new PIDController(kP, kI, kD);
+        controller = new PIDController(kP, kI, kD, 0);
 
         this.telemetry = telemetry;
 

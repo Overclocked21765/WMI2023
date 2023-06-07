@@ -84,7 +84,7 @@ public class SleeveDetection extends OpenCvPipeline {
                     CYAN,
                     2
             );
-        }
+         }
 
         // Release and return input
         areaMat.release();
