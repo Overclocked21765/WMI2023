@@ -8,7 +8,7 @@ public class PIDController {
     private double kP;
     private double kI;
     private double kD;
-    public double a = 0.25;
+    public double a = 0.7;
     private double integralSumLimit;
 
     private ElapsedTime timer;
