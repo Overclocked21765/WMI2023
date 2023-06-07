@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Config
 public class PIDController {
     private double kP;
     private double kI;
     private double kD;
-    private double a;
+    public double a = 0.25;
     private double integralSumLimit;
 
     private ElapsedTime timer;
@@ -29,7 +31,6 @@ public class PIDController {
         this.kD = kD;
         totalError = 0;
         dt = 0;
-        a = 0.25;
         integralSumLimit = 0.8;
         timer = new ElapsedTime();
         lastEstimate = 0;

@@ -29,6 +29,8 @@ public class Slide {
     public static double kI = 0;
     public static double kD = 0.8;
 
+    public static int test_target = 0;
+
     private PIDController controller;
 
     Telemetry telemetry;
@@ -134,7 +136,7 @@ public class Slide {
     }
 
     public int getTargetPos(){
-        return linearSlideMotor.getTargetPosition();
+        return (int) target;
     }
     public int getSlidePos(){
         return linearSlideMotor.getCurrentPosition();

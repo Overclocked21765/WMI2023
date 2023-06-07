@@ -24,10 +24,10 @@ public class PIDFTest extends OpMode {
 
     @Override
     public void loop(){
-        slide.setSlidePosition(Constants.test_target);
+        slide.setSlidePosition(Slide.test_target);
         slide.update();
         telemetry.addData("pos:", slide.getSlidePos());
-        telemetry.addData("target", Constants.test_target);
+        telemetry.addData("target", Slide.test_target);
     }
 
 }

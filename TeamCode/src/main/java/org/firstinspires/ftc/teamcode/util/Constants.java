@@ -28,7 +28,7 @@ public class Constants {
     public static int LINEAR_SLIDE_MINIMUM = 60; //lowest point   for linear slide
     public static int LINEAR_SLIDE_MAXIMUM = 1280; //highest point for linear slide
     public static final int LINEAR_SLIDE_MARGIN_ERROR = 10; //a margin of error to account for PID
-    public static int test_target = 0;
+
     //Rotation servo
     public static final double SLIDE_SERVO_ZERO_POSITION = 0.73;
     public static final double SLIDE_SERVO_ROTATED_POSITION = 0.04; //should be 0.04 for testing its been changed
