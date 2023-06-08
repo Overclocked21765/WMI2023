@@ -46,6 +46,18 @@ public class PIDController {
         lastEstimate = 0;
     }
 
+    public PIDController(double kP, double kI, double kD, double a, double initial){
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.a = a;
+        totalError = 0;
+        dt = 0;
+        integralSumLimit = 0.8;
+        timer = new ElapsedTime();
+        lastEstimate = initial;
+    }
+
     public void setPID(double kP, double kI, double kD){
         this.kP = kP;
         this.kI = kI;

@@ -142,9 +142,6 @@ public class TeleOpFullNew extends OpMode {
         //reset hardware for operation
         slide.setSlidePosition(Constants.GROUND_POSITION);
         telemetry.addData("Status: ", "Going to ground");
-        while (slide.getTargetPos() != slide.getSlidePosition()){
-
-        }
         claw.grab();
 
         telemetry.addData("Initiation", " Complete");
@@ -220,7 +217,7 @@ public class TeleOpFullNew extends OpMode {
         if ((gamepad1.left_trigger != 0) || (gamepad1.right_trigger !=0)){
             opmodeSlidePower = gamepad1.right_trigger - gamepad1.left_trigger;
             if (isFirstTimeAfterTriggerPress){
-                slide.setLinearSlideMotorRunMode();
+
                 isFirstTimeAfterTriggerPress = false;
             }
             telemetry.addData("Slide Mode: ", "Manual");
@@ -230,7 +227,7 @@ public class TeleOpFullNew extends OpMode {
         } else {
             isFirstTimeAfterTriggerPress = true;
             if (isFirstTimeAfterTriggerRelease){
-                slide.setSlidePosition(slide.getSlidePosition());
+                slide.pidReset(slide.getSlidePosition());
                 isFirstTimeAfterTriggerRelease = false;
             }
             telemetry.addData("Slide Mode: ", "Run to position");
@@ -407,7 +404,7 @@ public class TeleOpFullNew extends OpMode {
                         }
                         break;
                     case GOING_TO_GROUND:
-                        if (slide.getSlidePos() <= (Constants.GROUND_POSITION + 3)) {
+                        if (slide.getSlidePos() <= (Constants.GROUND_POSITION + 20)) {
                             cycleRequested = false;
                         }
                         break;

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
@@ -22,10 +23,10 @@ public class Slide {
     private boolean hasBeenToldToRotate;
     private double target;
 
-    public static double kF = 0;
-    public static double kP = 0;
+    public static double kF = 0.21;
+    public static double kP = 0.05;
     public static double kI = 0;
-    public static double kD = 0;
+    public static double kD = 0.1;
 
     public static int test_target = 0;
 
@@ -146,5 +147,10 @@ public class Slide {
 
     public void stopAndReset(){
         linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public void pidReset(double currentState){
+        controller = new PIDController(kP, kI, kD, 0, currentState);
+        setSlidePosition(currentState);
     }
 }
