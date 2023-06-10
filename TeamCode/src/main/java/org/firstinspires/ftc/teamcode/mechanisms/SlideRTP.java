@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 
@@ -16,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.PIDController;
 //negative power is extend, positive is retract
 
 @Config
-public class Slide {
+public class SlideRTP {
     private DcMotorEx linearSlideMotor;
     private Servo slideServo;
     private double ticksPerRevolution;
@@ -26,7 +25,7 @@ public class Slide {
     public static double kF = 0.21;
     public static double kP = 0.05;
     public static double kI = 0;
-    public static double kD = 0.23;
+    public static double kD = 0.15;
 
     public static int test_target = 0;
 
@@ -58,7 +57,7 @@ public class Slide {
     public void init(HardwareMap hwMap){
         linearSlideMotor = hwMap.get(DcMotorEx.class, "Slide_Motor");
         linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         linearSlideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -74,14 +73,14 @@ public class Slide {
         slideServo.setPosition(Constants.SLIDE_SERVO_ZERO_POSITION);
     }
 
-    /*
+
     public void setSlidePosition(int encoderPosition){
         linearSlideMotor.setTargetPosition(encoderPosition);
         linearSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         linearSlideMotor.setPower(Constants.MOTOR_SLIDE_POWER);
     }
 
-     */
+
 
     public void moveSlide(double speed){
         if (linearSlideMotor.getCurrentPosition() >= (Constants.LINEAR_SLIDE_MINIMUM - Constants.LINEAR_SLIDE_MARGIN_ERROR) && linearSlideMotor.getCurrentPosition() <= (Constants.LINEAR_SLIDE_MAXIMUM - Constants.LINEAR_SLIDE_MARGIN_ERROR)){
@@ -114,10 +113,12 @@ public class Slide {
     public void moveSlideNoLimitations(double power){
         linearSlideMotor.setPower(power * Constants.MOTOR_SLIDE_POWER);
     }
-
+    /*
     public void setSlidePosition(double target){
         this.target = target;
     }
+
+     */
 
     public void update(){
         controller.setPID(kP, kI, kD);
@@ -148,9 +149,11 @@ public class Slide {
     public void stopAndReset(){
         linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-
+    /*
     public void pidReset(double currentState){
         controller = new PIDController(kP, kI, kD, 0, currentState);
         setSlidePosition(currentState);
     }
+
+     */
 }

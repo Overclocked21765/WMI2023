@@ -33,14 +33,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.util.Constants;
-import org.firstinspires.ftc.teamcode.util.SlideLevels;
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
 import org.firstinspires.ftc.teamcode.mechanisms.Slide;
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.SlideLevels;
 
-@TeleOp(name = "drivers, pick up your controllers (new)")
-public class TeleOpFullNew extends OpMode {
+@TeleOp(name = "drivers, pick up your controllers (float)")
+public class TeleOpFullNewFloat extends OpMode {
 
 
     enum SlideStates{
@@ -178,7 +178,7 @@ public class TeleOpFullNew extends OpMode {
                 driveTrain.getHeadingDeg(),
                 drivePower
         ); //drive
-
+        
         if (gamepad1.y && !yAlreadyPressed){
             driveTrain.resetYaw();
 
@@ -304,6 +304,7 @@ public class TeleOpFullNew extends OpMode {
         if (gamepad1.right_bumper && !rightBumperAlreadyPressed) {
             if (canRotate){
                 claw.grab();
+                wantToGrab = false;
             }
             switch (level) {
                 case GROUND:
@@ -328,10 +329,11 @@ public class TeleOpFullNew extends OpMode {
                     break;
             }
         }
-
+        
         if (gamepad1.left_bumper && !leftBumperAlreadyPressed) {
             if (canRotate){
                 claw.grab();
+                wantToGrab = false;
             }
             switch (level) {
                 case GROUND:
@@ -465,16 +467,12 @@ public class TeleOpFullNew extends OpMode {
         //slide reset stuff (in case of bad initialization)
 
         if (gamepad1.start){
-            if (resetSlideFirstTime){
-                slide.setLinearSlideMotorRunMode();
-                resetSlideFirstTime = false;
-            }
             startLetGoFirstTime = true;
             slide.moveSlideNoLimitations(Constants.MOTOR_SLIDE_RESET_POWER);
             telemetry.addData("Slide State: ", "Resetting");
         } else if (startLetGoFirstTime){
-            slide.moveSlideNoLimitations(0);
             slide.stopAndReset();
+            slide.pidReset(slide.getSlidePosition());
             startLetGoFirstTime = false;
             resetSlideFirstTime = true;
         } else if (gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0){

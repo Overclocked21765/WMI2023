@@ -21,7 +21,7 @@ public class SlidePositions extends OpMode{
         slideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        modifier = 0.1;
+        modifier = 0.7;
         xAlreadyPressed = false;
     }
 

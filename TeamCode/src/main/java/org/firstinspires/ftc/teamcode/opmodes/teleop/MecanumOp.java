@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
@@ -13,7 +14,7 @@ public class MecanumOp extends OpMode {
 
     @Override
     public void init(){
-        board.init(hardwareMap);
+        board.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT);
         yAlreadyPressed = false;
         telemetry.addData("Initialization ", "Complete");
     }

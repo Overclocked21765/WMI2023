@@ -33,14 +33,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.util.Constants;
-import org.firstinspires.ftc.teamcode.util.SlideLevels;
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
 import org.firstinspires.ftc.teamcode.mechanisms.Slide;
+import org.firstinspires.ftc.teamcode.mechanisms.SlideRTP;
+import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.SlideLevels;
 
-@TeleOp(name = "drivers, pick up your controllers (new)")
-public class TeleOpFullNew extends OpMode {
+@TeleOp(name = "drivers, pick up your controllers (RTP)")
+public class TeleOpFullNewRTP extends OpMode {
 
 
     enum SlideStates{
@@ -54,7 +55,7 @@ public class TeleOpFullNew extends OpMode {
 
     //robot "subsystems"
     DriveTrain driveTrain = new DriveTrain();
-    Slide slide = new Slide();
+    SlideRTP slide = new SlideRTP();
     Claw claw = new Claw();
 
     private ElapsedTime slideTimer = new ElapsedTime();
@@ -178,7 +179,7 @@ public class TeleOpFullNew extends OpMode {
                 driveTrain.getHeadingDeg(),
                 drivePower
         ); //drive
-
+        
         if (gamepad1.y && !yAlreadyPressed){
             driveTrain.resetYaw();
 
@@ -249,7 +250,7 @@ public class TeleOpFullNew extends OpMode {
         } else {
             isFirstTimeAfterTriggerPress = true;
             if (isFirstTimeAfterTriggerRelease){
-                slide.pidReset(slide.getSlidePosition());
+                slide.setSlidePosition(slide.getSlidePosition());
                 isFirstTimeAfterTriggerRelease = false;
             }
             telemetry.addData("Slide Mode: ", "Run to position");
@@ -304,6 +305,7 @@ public class TeleOpFullNew extends OpMode {
         if (gamepad1.right_bumper && !rightBumperAlreadyPressed) {
             if (canRotate){
                 claw.grab();
+                wantToGrab = false;
             }
             switch (level) {
                 case GROUND:
@@ -328,10 +330,11 @@ public class TeleOpFullNew extends OpMode {
                     break;
             }
         }
-
+        
         if (gamepad1.left_bumper && !leftBumperAlreadyPressed) {
             if (canRotate){
                 claw.grab();
+                wantToGrab = false;
             }
             switch (level) {
                 case GROUND:
@@ -477,8 +480,6 @@ public class TeleOpFullNew extends OpMode {
             slide.stopAndReset();
             startLetGoFirstTime = false;
             resetSlideFirstTime = true;
-        } else if (gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0){
-            slide.update();
         }
 
 

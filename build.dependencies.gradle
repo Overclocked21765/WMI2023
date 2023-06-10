@@ -21,5 +21,9 @@ dependencies {
     implementation 'org.firstinspires.ftc:gameAssets-PowerPlay:1.0.0'
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.4.8'
+
+    implementation('org.tensorflow:tensorflow-lite:2.0.0')
+    implementation('org.tensorflow:tensorflow-lite-gpu:2.0.0')
+    implementation('org.tensorflow:tensorflow-lite-support:0.0.0-nightly') { changing = true }
 }
 

@@ -49,7 +49,7 @@ public class WMI extends OpMode {
 
     boolean wantToPark;
 
-    public static double timeToPark = 24;
+    public static double timeToPark = 19;
     public static int coneIndex;
 
     public static double startX = -35;
@@ -168,6 +168,7 @@ public class WMI extends OpMode {
                         } else {
                             drive.followTrajectorySequenceAsync(zoneTwo);
                         }
+                        clawTimer.reset();
                         state = AutoCycleNewPathsRight.States.PARKING;
 
 
@@ -188,21 +189,36 @@ public class WMI extends OpMode {
                 break;
             case HEADING_TO_CONES_2:
                 if (slideTImer.time() > Constants.SERVO_ROTATE_TIME){
-                    slide.setSlidePosition(coneStackValues[coneIndex]);
-                    coneIndex++;
+                    claw.grab();
+                    clawTimer.reset();
                     state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_3;
                 }
                 break;
             case HEADING_TO_CONES_3:
+                if (clawTimer.time() > Constants.TIME_FOR_RELEASE_CLAW){
+                    slide.setSlidePosition(coneStackValues[coneIndex]);
+
+                    state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_4;
+                }
+                break;
+            case HEADING_TO_CONES_4:
+                if (slide.getSlidePos() < Constants.RED_ZONE){
+                    claw.release();
+                    state = AutoCycleNewPathsRight.States.HEADING_TO_CONES_5;
+                }
+                break;
+
+            case HEADING_TO_CONES_5:
                 if (!drive.isBusy()){
                     claw.grab();
                     clawTimer.reset();
+                    coneIndex++;
                     state = AutoCycleNewPathsRight.States.GRABBING_1;
                 }
                 break;
             case GRABBING_1:
                 if (clawTimer.time() > Constants.TIME_FOR_RELEASE_CLAW){
-                    slide.setSlidePosition(Constants.RED_ZONE);
+                    slide.setSlidePosition(Constants.MEDIUM_POSITION);
                     state = AutoCycleNewPathsRight.States.GRABBING_2;
                 }
                 break;
@@ -215,14 +231,21 @@ public class WMI extends OpMode {
                 }
                 break;
             case PARKING:
-                if (clawTimer.time() >  Constants.TIME_FOR_RELEASE_CLAW){
-                    slide.setSlidePosition(Constants.GROUND_POSITION);
-                    state = AutoCycleNewPathsRight.States.PARKING_2;
-                }
-            case PARKING_2:
                 if (!drive.isBusy()){
                     state = AutoCycleNewPathsRight.States.STILL_1;
                 }
+                break;
+            case STILL_1:
+                claw.grab();
+                clawTimer.reset();
+                state = AutoCycleNewPathsRight.States.STILL_2;
+                break;
+            case STILL_2:
+                if (clawTimer.time() > 0.5){
+                    slide.setSlidePosition(Constants.GROUND_POSITION);
+                    state = AutoCycleNewPathsRight.States.STILL_3;
+                }
+                break;
         }
         drive.update();
         slide.update();
