@@ -46,4 +46,5 @@ public class Constants {
         public static final double ONE_SECOND = 1;
     }
 
+    //XPS gang
 }
