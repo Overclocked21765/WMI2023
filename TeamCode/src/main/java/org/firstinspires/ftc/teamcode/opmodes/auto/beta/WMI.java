@@ -55,8 +55,8 @@ public class WMI extends OpMode {
     public static double startX = -35;
     public static double startY = -63;
     public static double signalY = -5;
-    public static double scoreX = -28;
-    public static double scoreY = -21;
+    public static double scoreX = -29;
+    public static double scoreY = -20.5;
     public static double tangentX = -44;
     public static double coneX = -63.5;
     public static double coneY = -11.5;

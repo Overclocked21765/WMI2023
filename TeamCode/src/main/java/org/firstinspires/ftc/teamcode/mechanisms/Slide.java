@@ -147,6 +147,7 @@ public class Slide {
 
     public void stopAndReset(){
         linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void pidReset(double currentState){
