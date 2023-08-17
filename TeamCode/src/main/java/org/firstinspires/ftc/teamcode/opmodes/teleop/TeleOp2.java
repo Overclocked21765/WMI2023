@@ -35,12 +35,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
+import org.firstinspires.ftc.teamcode.mechanisms.HeadingPID;
 import org.firstinspires.ftc.teamcode.mechanisms.Slide;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.SlideLevels;
 
-@TeleOp(name = "drivers, pick up your controllers (float)")
-public class TeleOpFullNewFloat extends OpMode {
+@TeleOp(name = "drivers, pick up your controllers (2)")
+public class TeleOp2 extends OpMode {
 
 
     enum SlideStates{
@@ -53,7 +54,7 @@ public class TeleOpFullNewFloat extends OpMode {
     }
 
     //robot "subsystems"
-    DriveTrain driveTrain = new DriveTrain();
+    HeadingPID driveTrain;
     Slide slide = new Slide();
     Claw claw = new Claw();
 
@@ -111,9 +112,13 @@ public class TeleOpFullNewFloat extends OpMode {
 
         maxLoop = 0;
         minLoop = 0;
+
         firstloop = true;
 
-        driveTrain.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT);
+        driveTrain = new HeadingPID(0);
+
+        driveTrain.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT, telemetry);
+        driveTrain.resetYaw();
         //When the slide initializes the claw will go to the slide servo position 0.71
         slide.init(hardwareMap, telemetry);
         claw.init(hardwareMap);
@@ -165,6 +170,11 @@ public class TeleOpFullNewFloat extends OpMode {
     }
 
     @Override
+    public void init_loop(){
+        slide.update();
+    }
+
+    @Override
     public void start(){
         //reset the gyro
         driveTrain.resetYaw();
@@ -182,13 +192,7 @@ public class TeleOpFullNewFloat extends OpMode {
             drivePower = (wantSlowDrive) ? Constants.SLOW_DRIVE_MODIFIER : Constants.DRIVE_POWER_MODIFIER;
         }
 
-        driveTrain.drive(
-                -gamepad1.right_stick_x,
-                -gamepad1.left_stick_x,
-                gamepad1.left_stick_y,
-                driveTrain.getHeadingDeg(),
-                drivePower
-        ); //drive
+        driveTrain.update(-gamepad1.left_stick_x, gamepad1.left_stick_y, -gamepad1.right_stick_x);
         
         if (gamepad1.y && !yAlreadyPressed){
             driveTrain.resetYaw();
@@ -260,7 +264,7 @@ public class TeleOpFullNewFloat extends OpMode {
         } else {
             isFirstTimeAfterTriggerPress = true;
             if (isFirstTimeAfterTriggerRelease){
-                slide.pidReset(slide.getSlidePosition());
+                slide.pidReset(slide.i2cCall());
                 isFirstTimeAfterTriggerRelease = false;
             }
             telemetry.addData("Slide Mode: ", "Run to position");
@@ -442,6 +446,7 @@ public class TeleOpFullNewFloat extends OpMode {
                         if (slideTimer.time() > Constants.SERVO_ROTATE_TIME) {
                             slide.setSlidePosition(Constants.GROUND_POSITION);
                             slideState = SlideStates.GOING_TO_GROUND;
+                            wantToGrab = false;
                         }
                         break;
                     case GOING_TO_GROUND:
@@ -483,7 +488,7 @@ public class TeleOpFullNewFloat extends OpMode {
             telemetry.addData("Slide State: ", "Resetting");
         } else if (startLetGoFirstTime){
             slide.stopAndReset();
-            slide.pidReset(slide.getSlidePosition());
+            slide.pidReset(slide.i2cCall());
             startLetGoFirstTime = false;
             resetSlideFirstTime = true;
         } else if (gamepad1.left_trigger == 0 && gamepad1.right_trigger == 0){
@@ -528,7 +533,6 @@ public class TeleOpFullNewFloat extends OpMode {
 
     @Override
     public void stop(){
-        slide.setSlidePosition(Constants.GROUND_POSITION);
         claw.grab();
         telemetry.addData("Max Loop Time: ", maxLoop);
         telemetry.addData("Min Loop Time", minLoop);

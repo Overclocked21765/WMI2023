@@ -22,6 +22,7 @@ public class Slide {
     private double ticksPerRevolution;
     private boolean hasBeenToldToRotate;
     private double target;
+    private double slidePos;
 
     public static double kF = 0.21;
     public static double kP = 0.05;
@@ -100,7 +101,7 @@ public class Slide {
     }
 
     public int getSlidePosition(){
-        return linearSlideMotor.getCurrentPosition();
+        return (int) slidePos;
     }
 
     public void rotateServo(){
@@ -121,7 +122,8 @@ public class Slide {
 
     public void update(){
         controller.setPID(kP, kI, kD);
-        double power = controller.calculate(getSlidePos(), target);
+        slidePos = linearSlideMotor.getCurrentPosition();
+        double power = controller.calculate(slidePos, target);
         linearSlideMotor.setPower(kF + power);
         telemetry.addData("Target: ", target);
         telemetry.addData("Current position: ", linearSlideMotor.getCurrentPosition());
@@ -138,7 +140,7 @@ public class Slide {
         return (int) target;
     }
     public int getSlidePos(){
-        return linearSlideMotor.getCurrentPosition();
+        return (int) slidePos;
     }
 
     public double getServoPosition(){
@@ -152,5 +154,10 @@ public class Slide {
     public void pidReset(double currentState){
         controller = new PIDController(kP, kI, kD, 0, currentState);
         setSlidePosition(currentState);
+    }
+
+    public int i2cCall(){
+        slidePos = linearSlideMotor.getCurrentPosition();
+        return (int) slidePos;
     }
 }
