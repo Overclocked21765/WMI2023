@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.Slide;
 import org.firstinspires.ftc.teamcode.util.Constants;
 import org.firstinspires.ftc.teamcode.util.SlideLevels;
 
-@TeleOp(name = "drivers, pick up your controllers (2)")
+@TeleOp(name = "teleop for 1150 rpm")
 public class TeleOp2 extends OpMode {
 
 

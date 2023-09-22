@@ -33,14 +33,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.mechanisms.BulkReader;
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
 import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
-import org.firstinspires.ftc.teamcode.mechanisms.Slide;
+import org.firstinspires.ftc.teamcode.mechanisms.HeadingPID;
 import org.firstinspires.ftc.teamcode.mechanisms.SlideRTP;
-import org.firstinspires.ftc.teamcode.util.Constants;
+import org.firstinspires.ftc.teamcode.util.slowermotors.Constants;
+import org.firstinspires.ftc.teamcode.util.LoopTimer;
 import org.firstinspires.ftc.teamcode.util.SlideLevels;
 
-@TeleOp(name = "drivers, pick up your controllers (RTP)")
+@TeleOp(name = "teleop for 312 rpm (rtp)")
 public class TeleOpFullNewRTP extends OpMode {
 
 
@@ -54,12 +56,14 @@ public class TeleOpFullNewRTP extends OpMode {
     }
 
     //robot "subsystems"
-    DriveTrain driveTrain = new DriveTrain();
+    HeadingPID driveTrain;
     SlideRTP slide = new SlideRTP();
     Claw claw = new Claw();
+    BulkReader reader = new BulkReader();
 
     private ElapsedTime slideTimer = new ElapsedTime();
     private ElapsedTime clawTimer = new ElapsedTime();
+    private LoopTimer loopTime;
 
     //State machine booleans for the gamepad (see LearnJavaForFTC pdf chapter 12 for more info)
     boolean aAlreadyPressed;
@@ -100,9 +104,16 @@ public class TeleOpFullNewRTP extends OpMode {
     SlideLevels junctionLevel;
     SlideStates slideState;
 
+
+
     @Override
     public void init(){
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        reader.init(hardwareMap);
+
+        driveTrain = new HeadingPID(0);
+
+
 
         driveTrain.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT);
         //When the slide initializes the claw will go to the slide servo position 0.71
@@ -146,6 +157,8 @@ public class TeleOpFullNewRTP extends OpMode {
         level = SlideLevels.GROUND;
         junctionLevel = SlideLevels.GROUND;
 
+        loopTime = new LoopTimer(telemetry);
+
         //reset hardware for operation
         slide.setSlidePosition(Constants.GROUND_POSITION);
         telemetry.addData("Status: ", "Going to ground");
@@ -157,15 +170,18 @@ public class TeleOpFullNewRTP extends OpMode {
 
     @Override
     public void start(){
+        reader.update();
         //reset the gyro
         driveTrain.resetYaw();
         slideTimer.reset();
         clawTimer.reset();
+        loopTime.reset();
+
     }
 
     @Override
     public void loop(){
-
+        reader.update();
         //drive
         if (gamepad1.back && !leftJoystickPressed){
             wantSlowDrive = !wantSlowDrive;
@@ -498,10 +514,11 @@ public class TeleOpFullNewRTP extends OpMode {
         leftJoystickPressed = gamepad1.left_stick_button;
         rightStickPressed = gamepad1.right_stick_button;
 
+        loopTime.updateLoop();
     }
 
     @Override
     public void stop(){
-        slide.setSlidePosition(Constants.GROUND_POSITION);
+        loopTime.endLoop();
     }
 }
