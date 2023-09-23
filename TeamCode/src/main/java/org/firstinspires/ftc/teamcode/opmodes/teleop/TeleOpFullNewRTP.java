@@ -115,7 +115,7 @@ public class TeleOpFullNewRTP extends OpMode {
 
 
 
-        driveTrain.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT);
+        driveTrain.init(hardwareMap, DcMotor.ZeroPowerBehavior.FLOAT, telemetry);
         //When the slide initializes the claw will go to the slide servo position 0.71
         slide.init(hardwareMap, telemetry);
         claw.init(hardwareMap);
@@ -188,12 +188,10 @@ public class TeleOpFullNewRTP extends OpMode {
             drivePower = (wantSlowDrive) ? Constants.SLOW_DRIVE_MODIFIER : Constants.DRIVE_POWER_MODIFIER;
         }
 
-        driveTrain.drive(
+        driveTrain.update(
                 -gamepad1.right_stick_x,
                 -gamepad1.left_stick_x,
-                gamepad1.left_stick_y,
-                driveTrain.getHeadingDeg(),
-                drivePower
+                gamepad1.left_stick_y
         ); //drive
         
         if (gamepad1.y && !yAlreadyPressed){
