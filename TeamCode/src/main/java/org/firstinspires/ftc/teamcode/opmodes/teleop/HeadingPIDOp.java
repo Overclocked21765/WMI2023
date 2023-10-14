@@ -25,7 +25,7 @@ public class HeadingPIDOp extends OpMode {
     @Override
     public void loop(){
         drive.update(-gamepad1.left_stick_x, gamepad1.left_stick_y, -gamepad1.right_stick_x);
-
+//double leftX, double leftY, double rightX
         if (gamepad1.y && !buttonAlreadyPressed){
             drive.resetYaw();
         }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.test;
+/** package org.firstinspires.ftc.teamcode.test;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp()
 @Disabled
 public class OpTest extends OpMode {
-    ProgrammingBoard1 board = new ProgrammingBoard1();
+    //ProgrammingBoard1 board = new ProgrammingBoard1();
     boolean toggleState;
     double pressCount = 0;
     boolean dPadPressed;
@@ -78,7 +78,7 @@ public class OpTest extends OpMode {
             previousToggleState = !toggleState;
         }
         */
-
+/**
     }
 }
-//comment
+**/

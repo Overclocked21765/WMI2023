@@ -35,12 +35,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.mechanisms.BulkReader;
 import org.firstinspires.ftc.teamcode.mechanisms.Claw;
-import org.firstinspires.ftc.teamcode.mechanisms.DriveTrain;
 import org.firstinspires.ftc.teamcode.mechanisms.HeadingPID;
 import org.firstinspires.ftc.teamcode.mechanisms.SlideRTP;
-import org.firstinspires.ftc.teamcode.util.slowermotors.Constants;
 import org.firstinspires.ftc.teamcode.util.LoopTimer;
 import org.firstinspires.ftc.teamcode.util.SlideLevels;
+import org.firstinspires.ftc.teamcode.util.Constants;
 
 @TeleOp(name = "teleop for 312 rpm (rtp)")
 public class TeleOpFullNewRTP extends OpMode {
@@ -189,9 +188,9 @@ public class TeleOpFullNewRTP extends OpMode {
         }
 
         driveTrain.update(
-                -gamepad1.right_stick_x,
                 -gamepad1.left_stick_x,
-                gamepad1.left_stick_y
+                gamepad1.left_stick_y ,
+                -gamepad1.right_stick_x
         ); //drive
         
         if (gamepad1.y && !yAlreadyPressed){
